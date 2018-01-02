@@ -1,2 +1,10 @@
-# TinyWeb
-This is a python implementation of &lt;&lt;CASPP>>-Tiny Web Server.
+# Tiny Web Server
+This is a python implementation of a iterative `Tiny Web Server`
+to handle HTTP/1.0 events.
+
+<br>
+
+##### HTTP events support
+
+- 'GET'
+- others are under updated.
