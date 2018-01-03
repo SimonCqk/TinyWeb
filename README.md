@@ -1,5 +1,5 @@
 # Tiny Web Server
-This is a python implementation of a iterative `Tiny Web Server`
+This is a python implementation of a simple, iterative `Tiny Web Server`
 to handle HTTP/1.0 events.
 
 <br>
