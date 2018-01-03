@@ -1,6 +1,7 @@
 '''
 :include: some tool-functions used by TINY WEB.
 '''
+import os
 import sys
 from socket import socket
 
@@ -31,17 +32,12 @@ def read_request_headers(request: str):
     '''
 
     def _split_request(req: str):
-        lines = req.split('\n')
-        for line in lines:
-            yield line
+        lines = req.split('\r\n')
+        for l in lines:
+            yield l
 
-    buf = next(_split_request(request))
-    while buf != '\r\n':
-        try:
-            buf = next(_split_request(request))
-        except StopIteration:
-            break
-        print(buf, file=sys.stdout)
+    for line in _split_request(request):
+        print(line, file=sys.stdout)
 
 
 def get_file_type(fname: str):
@@ -59,15 +55,37 @@ def get_file_type(fname: str):
         return 'text/plain'
 
 
-def serve_static():
+def serve_static(sock: socket, filename, filesize):
     '''
     send a HTTP response, which contains a local file.
     '''
-    pass
+    # send response headers to client
+    ftype = get_file_type(filename)
+    buffer = 'HTTP/1.0 200 OK\r\n' + \
+             'Server: Tiny Web Server\r\n' + \
+             'Connection: close\r\n' + \
+             'Content-length: {}\r\n'.format(filesize) + \
+             'Content-type: {}\r\n\r\n'.format(ftype)
+    sock.send(buffer.encode('utf-8'))
+    print('Response headers:\n', file=sys.stdout)
+    print(buffer)
+    # send response body to client
+    src = open(filename, 'r').read()
+    sock.send(src.encode('utf-8'))
 
 
-def serve_dynamic():
+def serve_dynamic(sock: socket, filename, cgi_args):
     '''
     derive a sub process to run a CGI program and providing kinds of dynamic contents.
     '''
-    pass
+    buffer = 'HTTP/1.0 200 OK\r\n'
+    sock.send(buffer.encode('utf-8'))
+    buffer = 'Server: Tiny Web Server\r\n'
+    sock.send(buffer.encode('utf-8'))
+    ori_out = sys.stdout
+    if os.fork() == 0:
+        os.environ['QUERY_STRING'] = cgi_args
+        sys.stdout = sock
+        os.execve(filename, [], os.environ)
+    os.wait()
+    sys.stdout = ori_out
