@@ -1,4 +1,4 @@
-def uri_parser(uri: str, filename: str, cgi_args=None):
+def uri_parser(uri: str, cgi_args=None):
     '''
     parse the URL and implement all the WEB-requests strategies.
     :assume: the main directory of static content is `current directory`,
@@ -8,7 +8,7 @@ def uri_parser(uri: str, filename: str, cgi_args=None):
         filename = '.' + uri
         if uri.endswith('/'):
             filename += 'home.html'
-        return uri, filename, cgi_args
+        return uri, filename, cgi_args, True
     else:  # dynamic content
         try:
             idx = uri.index('?')
@@ -17,4 +17,4 @@ def uri_parser(uri: str, filename: str, cgi_args=None):
         if not idx:
             cgi_args = uri[idx + 1:]
         filename = '.' + uri
-        return uri, filename, cgi_args
+        return uri, filename, cgi_args, False

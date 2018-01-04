@@ -55,22 +55,22 @@ def get_file_type(fname: str):
         return 'text/plain'
 
 
-def serve_static(sock: socket, filename, filesize):
+def serve_static(sock: socket, filename):
     '''
     send a HTTP response, which contains a local file.
     '''
     # send response headers to client
     ftype = get_file_type(filename)
+    src = open(filename, 'r').read()
     buffer = 'HTTP/1.0 200 OK\r\n' + \
              'Server: Tiny Web Server\r\n' + \
              'Connection: close\r\n' + \
-             'Content-length: {}\r\n'.format(filesize) + \
+             'Content-length: {}\r\n'.format(len(src)) + \
              'Content-type: {}\r\n\r\n'.format(ftype)
     sock.send(buffer.encode('utf-8'))
     print('Response headers:\n', file=sys.stdout)
     print(buffer)
     # send response body to client
-    src = open(filename, 'r').read()
     sock.send(src.encode('utf-8'))
 
 
