@@ -40,16 +40,16 @@ def read_request_headers(request: str):
         print(line, file=sys.stdout)
 
 
-def get_file_type(fname: str):
-    if not isinstance(fname, str):
+def get_file_type(filename: str):
+    if not isinstance(filename, str):
         raise TypeError('A invalid file name passed in.')
-    if fname.endswith('.html'):
+    if filename.endswith('.html'):
         return 'text/html'
-    elif fname.endswith('.gif'):
+    elif filename.endswith('.gif'):
         return 'image/gif'
-    elif fname.endswith('.png'):
+    elif filename.endswith('.png'):
         return 'image/png'
-    elif fname.endswith('.jpeg'):
+    elif filename.endswith('.jpeg'):
         return 'image/jpeg'
     else:
         return 'text/plain'
@@ -60,13 +60,13 @@ def serve_static(sock: socket, filename):
     send a HTTP response, which contains a local file.
     '''
     # send response headers to client
-    ftype = get_file_type(filename)
+    file_type = get_file_type(filename)
     src = open(filename, 'r').read()
     buffer = 'HTTP/1.0 200 OK\r\n' + \
              'Server: Tiny Web Server\r\n' + \
              'Connection: close\r\n' + \
              'Content-length: {}\r\n'.format(len(src)) + \
-             'Content-type: {}\r\n\r\n'.format(ftype)
+             'Content-type: {}\r\n\r\n'.format(file_type)
     sock.send(buffer.encode('utf-8'))
     print('Response headers:\n', file=sys.stdout)
     print(buffer)
@@ -83,7 +83,7 @@ def serve_dynamic(sock: socket, filename, cgi_args):
     buffer = 'Server: Tiny Web Server\r\n'
     sock.send(buffer.encode('utf-8'))
     ori_out = sys.stdout
-    if os.fork() == 0:
+    if os.fork() == 0:  # fork a sub-process to execute
         os.environ['QUERY_STRING'] = cgi_args
         sys.stdout = sock
         os.execve(filename, [], os.environ)
