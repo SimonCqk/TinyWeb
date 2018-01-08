@@ -14,7 +14,11 @@ def main(argv):
     if len(argv) is not 2:
         print('usage: {} <port>'.format(argv[0]), file=sys.stderr)
         return
-    port = argv[1]
+    try:
+        port = int(argv[1])
+    except ValueError:
+        print('Invalid literal for <port>.'.format(argv[1]), file=sys.stderr)
+        return
     addr = (HOST, port)
     tcp_ser_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcp_ser_sock.bind(addr)
